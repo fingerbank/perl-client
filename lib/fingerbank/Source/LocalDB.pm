@@ -220,14 +220,7 @@ sub _getCombinationID {
         # If API is configured, we want an exact match to save us some time by avoiding a complex query
         my $resultset;
         if ( fingerbank::Config::is_api_key_configured && fingerbank::Config::do_we_interrogate_upstream ) {
-            $resultset = $db->handle->resultset('Combination')->search({
-              dhcp_fingerprint_id   => $self->DHCP_Fingerprint_id,
-              dhcp_vendor_id        => $self->DHCP_Vendor_id,
-              user_agent_id         => $self->User_Agent_id,
-              mac_vendor_id         => $self->MAC_Vendor_id,
-              dhcp6_fingerprint_id  => $self->DHCP6_Fingerprint_id,
-              dhcp6_enterprise_id   => $self->DHCP6_Enterprise_id,
-            })->first;
+            $resultset = $db->handle->resultset('CombinationMatchExact')->search({}, { bind => [ @bindings ] })->first;
         }
         # Otherwise, we proceed with the complex select query using a view and where / case clauses 
         else {
