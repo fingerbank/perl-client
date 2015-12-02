@@ -268,7 +268,7 @@ Return TRUE or FALSE whether if configured to interrogate Fingerbank upstream pr
 
 sub do_we_interrogate_upstream {
     my $interrogate_upstream = get_config('upstream', 'interrogate');
-    ( is_enabled($interrogate_upstream) ) ? return $TRUE : return $FALSE;
+    ( fingerbank::Util::is_enabled($interrogate_upstream) ) ? return $TRUE : return $FALSE;
 }
 
 =head2 update_p0f_map
