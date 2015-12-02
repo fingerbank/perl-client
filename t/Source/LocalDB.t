@@ -25,7 +25,7 @@ my $args = {
     dhcp_fingerprint => $data::seed::seed_data_ids{Valid_DHCP_Fingerprint}->{value},
     dhcp_vendor => $data::seed::seed_data_ids{Valid_DHCP_Vendor}->{value},
     user_agent => $data::seed::seed_data_ids{Valid_User_Agent}->{value},
-    mac => $data::seed::seed_data_ids{Valid_MAC_Vendor}->{mac},
+    mac => $data::seed::seed_data_ids{Valid_MAC_Vendor}->{mac}."abcdef",
 };
 
 my ($status, $result);
