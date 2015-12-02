@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use diagnostics;
 
+use lib 't';
 use lib 'lib';
 
 use Test::More;
