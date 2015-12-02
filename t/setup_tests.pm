@@ -3,6 +3,8 @@ package setup_tests;
 use strict;
 use warnings;
 
+use List::MoreUtils qw(any);
+
 use data::seed;
 use fingerbank::FilePath qw($INSTALL_PATH %SCHEMA_DBS);
 use fingerbank::Util qw(is_success);
@@ -48,10 +50,15 @@ sub seed_upstream_database {
 }
 
 sub import {
+    my ($package, @flags) = @_;
     setup_test_database("Local", $INSTALL_PATH."db/fingerbank_Local_Test.db");
     setup_test_database("Upstream", $INSTALL_PATH."db/fingerbank_Upstream_Test.db");
-    seed_local_database();
-    seed_upstream_database();
+    if(any {$_ eq "-seed"} @flags){
+        seed_local_database();
+        seed_upstream_database();
+    }
 }
+
+
 
 1;

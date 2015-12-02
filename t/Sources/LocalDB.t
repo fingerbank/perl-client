@@ -12,7 +12,7 @@ use Data::Dumper;
 use Data::Compare;
 
 BEGIN {
-    use setup_tests;
+    use setup_tests qw(-seed);
     use data::seed;
 }
 
