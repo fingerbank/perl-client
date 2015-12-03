@@ -55,11 +55,11 @@ BEGIN {
 
 =cut
 
-Readonly::Scalar our $INSTALL_PATH          => '/usr/local/fingerbank/';
-Readonly::Scalar our $CONF_FILE             => catfile($INSTALL_PATH, 'conf/fingerbank.conf');
-Readonly::Scalar our $CONFIG_DEFAULTS_FILE  => catfile($INSTALL_PATH, 'conf/fingerbank.conf.defaults');
-Readonly::Scalar our $CONFIG_DOC_FILE       => catfile($INSTALL_PATH, 'conf/fingerbank.conf.doc');
-Readonly::Scalar our $LOG_CONF_FILE         => catfile($INSTALL_PATH, 'conf/log.conf');
+our $INSTALL_PATH          = '/usr/local/fingerbank/';
+our $CONF_FILE             = catfile($INSTALL_PATH, 'conf/fingerbank.conf');
+our $CONFIG_DEFAULTS_FILE  = catfile($INSTALL_PATH, 'conf/fingerbank.conf.defaults');
+our $CONFIG_DOC_FILE       = catfile($INSTALL_PATH, 'conf/fingerbank.conf.doc');
+our $LOG_CONF_FILE         = catfile($INSTALL_PATH, 'conf/log.conf');
 Readonly::Scalar our $LOG_FILE              => catfile($INSTALL_PATH, 'logs/fingerbank.log');
 Readonly::Scalar our $LOCAL_DB_FILE         => catfile($INSTALL_PATH, 'db/fingerbank_Local.db');
 Readonly::Scalar our $UPSTREAM_DB_FILE      => catfile($INSTALL_PATH, 'db/fingerbank_Upstream.db');
