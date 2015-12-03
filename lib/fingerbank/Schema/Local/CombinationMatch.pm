@@ -5,6 +5,9 @@ use namespace::autoclean;
 
 extends 'fingerbank::Base::Schema::CombinationMatch';
 
+# Special case, we have wildcards when the column is empty
+# This view handles it
+
 # $1 = dhcp_fingerprint
 # $2 = dhcp_vendor
 # $3 = user_agent
