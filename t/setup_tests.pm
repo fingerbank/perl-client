@@ -51,6 +51,7 @@ sub seed_upstream_database {
 
 sub import {
     my ($package, @flags) = @_;
+    $fingerbank::FilePath::CONF_FILE = "$INSTALL_PATH/t/data/fingerbank.conf";
     setup_test_database("Local", $INSTALL_PATH."db/fingerbank_Local_Test.db");
     setup_test_database("Upstream", $INSTALL_PATH."db/fingerbank_Upstream_Test.db");
     if(any {$_ eq "-seed"} @flags){
