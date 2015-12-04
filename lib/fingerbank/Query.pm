@@ -29,6 +29,9 @@ has 'cache' => (is => 'rw', default => sub { fingerbank::NullCache->new });
 sub match {
     my ( $self, $args ) = @_;
     my $logger = fingerbank::Log::get_logger;
+
+    $self->parseArgs($args);
+
     my $matcher = fingerbank::SourceMatcher->new(cache => $self->cache);
     $matcher->register_source(fingerbank::Source::LocalDB->new);
     $matcher->register_source(fingerbank::Source::API->new);
@@ -41,6 +44,17 @@ sub matchEndpoint {
     my ( $self, $args ) = @_;
     my $result = $self->match($args);
     return defined($result) ? fingerbank::Model::Endpoint->fromResult($result) : undef;
+}
+
+sub parseArgs {
+    my ( $self, $args ) = @_;
+    my $logger = fingerbank::Log::get_logger;
+
+    # MAC Vendor handling (OUI)
+    $args->{'mac_vendor'} = $args->{'mac'};                         # Adding MAC vendor based on the MAC address
+    $args->{'mac_vendor'} =~ s/[:|\s|-]//g;                         # Removing separators
+    $args->{'mac_vendor'} = lc($args->{'mac_vendor'});              # Lowercasing
+    $args->{'mac_vendor'} = substr($args->{'mac_vendor'}, 0, 6);    # Only keep first 6 characters (OUI)
 }
 
 

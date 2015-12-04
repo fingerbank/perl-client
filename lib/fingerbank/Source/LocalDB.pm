@@ -55,9 +55,6 @@ sub match {
     # We set the status to OK so we can proceed
     my ($status, $status_msg) = $fingerbank::Status::OK;
 
-    # TODO: Review that part to make it less "hacky"
-    $args->{'mac_vendor'} = $args->{'mac'};
-
     # We assign the value of each key to the corresponding object attribute (ie.: DHCP_Fingerprint_value)
     # Note: We must have all of the keys in the query, either with a value or with ''
     $logger->debug("Attempting to match a device with the following attributes:");
@@ -153,12 +150,6 @@ sub _getQueryKeyIDs {
                 next;
             }
             $query->{'mac'} = delete $query->{'value'}; # The 'value' column is the 'mac' column in this specific case
-            my $mac = $query->{'mac'};
-            $mac =~ s/[:|\s|-]//g;      # Removing separators
-            $mac = lc($mac);            # Lowercasing
-            $mac = substr($mac, 0, 6);  # Only keep first 6 characters (OUI)
-            $query->{'mac'} = $mac;
-            $logger->debug("Attempting to find an ID for '$key'. This is a special case. Using mangled value '$mac'");
         }
 
         my $model = "fingerbank::Model::$key";
