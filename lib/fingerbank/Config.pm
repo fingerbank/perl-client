@@ -21,6 +21,7 @@ use fingerbank::Log;
 use fingerbank::Status;
 use fingerbank::Util qw(is_enabled is_success);
 use fingerbank::NullCache;
+use Time::HiRes qw(time stat);
 
 our %Config;
 our $CACHE = fingerbank::NullCache->new;
@@ -42,11 +43,20 @@ sub read_config {
     }
 
     # Check in the cache first
-    my $configCached = $CACHE->get('fingerbank::Config::read_config');
-    if(defined($configCached)) {
-        $logger->trace("Cache hit for fingerbank config");
-        tie %Config, 'fingerbank::ConfigRestore', $configCached;
-        return;
+    my $config_cached = $CACHE->get('fingerbank::Config::read_config');
+    my $cached_at = $CACHE->get('fingerbank::Config::read_config-cached_at');
+    if(defined($config_cached) && defined($cached_at)) {
+        my $conf_timestamp = ( stat($CONF_FILE) )[9];
+        my $conf_defaults_timestamp = ( stat($CONFIG_DEFAULTS_FILE) )[9];
+
+        if($cached_at > $conf_timestamp && $cached_at > $conf_defaults_timestamp) {
+            $logger->trace("Cache hit for fingerbank config");
+            tie %Config, 'fingerbank::ConfigRestore', $config_cached;
+            return;
+        }
+        else {
+            $logger->info("Fingerbank configuration has been changed on disk... Reloading");
+        }
     }
 
     # If a configuration file exists, load the defaults and override using the existing configuration file
@@ -81,6 +91,7 @@ sub read_config {
         tied(%Config)->SetFileName($CONF_FILE);
     }
     $CACHE->set('fingerbank::Config::read_config', tied(%Config));
+    $CACHE->set('fingerbank::Config::read_config-cached_at', time);
 }
 
 =head2 read_defaults
