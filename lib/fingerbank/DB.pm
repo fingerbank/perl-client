@@ -184,7 +184,7 @@ sub update_upstream {
 
     ($status, $status_msg) = fingerbank::Util::update_file( ('download_url' => $download_url, 'destination' => $destination, %params) );
 
-    fingerbank::Util::cleanup_backup_files($destination);
+    fingerbank::Util::cleanup_backup_files($destination, $Config->{upstream}{sqlite_db_retention});
 
     return ( $status, $status_msg )
 }

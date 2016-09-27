@@ -10,6 +10,13 @@ description=<<EOT
 URL to fetch the upstream Fingerbank project database
 EOT
 
+[upstream.sqlite_db_retention]
+type=numeric
+description=<<EOT
+Amount of upstream databases to retain on disk in db/.
+Should be at least one in case any running processes are still pointing on the old file descriptor of the database.
+EOT
+
 [upstream.interrogate]
 type=toggle
 options=enabled|disabled
