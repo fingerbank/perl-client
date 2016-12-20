@@ -18,6 +18,7 @@ use File::Find;
 use File::Touch;
 use LWP::UserAgent;
 use HTTP::Message;
+use Compress::Raw::Zlib;
 use POSIX;
 
 use fingerbank::Constant qw($TRUE $FALSE $FINGERBANK_USER $DEFAULT_BACKUP_RETENTION);
@@ -158,6 +159,7 @@ sub update_file {
         }
     }
 
+
     my $is_an_update;
     if ( -f $params{'destination'} ) {
         $is_an_update = $TRUE;
@@ -225,6 +227,8 @@ sub fetch_file {
     }
 
     my $Config = fingerbank::Config::get_config();
+    my $outfile = $params{'destination'}.".download";
+    my $download_url = $params{'download_url'};
 
     unless ( fingerbank::Config::is_api_key_configured() || (exists($params{'api_key'}) && $params{'api_key'} ne "") ) {
         my $msg = "Can't communicate with Fingerbank project without a valid API key.";
@@ -232,7 +236,7 @@ sub fetch_file {
         return ($fingerbank::Status::UNAUTHORIZED, $msg);
     }
 
-    $logger->debug("Downloading the latest version from '$params{'download_url'}' to '$params{'destination'}'");
+    $logger->debug("Downloading the latest version from '$download_url' to '$outfile'");
 
     my $ua = fingerbank::Util::get_lwp_client();
     $ua->timeout(60);   # An update query should not take more than 60 seconds
@@ -240,32 +244,59 @@ sub fetch_file {
     my $api_key = ( exists($params{'api_key'}) && $params{'api_key'} ne "" ) ? $params{'api_key'} : $Config->{'upstream'}{'api_key'};    
     $params{get_params} //= {};
     my %parameters = ( key => $api_key, %{$params{get_params}} );
-    my $url = URI->new($params{'download_url'});
+    my $url = URI->new($download_url);
     $url->query_form(%parameters);
 
+    my $fh;
+    unless (open($fh, ">", $outfile)) {
+        undef $ua;
+        return ($fingerbank::Status::INTERNAL_SERVER_ERROR, "Unable to open file $outfile in write mode")
+    };
     my ($status, $status_msg);
-    my $res = $ua->get($url);
+
+    #  To avoid high memory consumption handle the decompression manually
+    #  And save the file contents to file system while downloading
+    my $ctx = Digest::MD5->new;
+    my $req = HTTP::Request->new(GET => $url);
+    my $gz = Compress::Raw::Zlib::Inflate->new(WindowBits => WANT_GZIP);
+    my $res = $ua->request($req, sub {
+        my ($data, $response, $protocol) = @_;
+        my $out = '';
+        my $content_encoding = $response->content_encoding;
+        if (defined $content_encoding && ($content_encoding eq 'gzip' || $content_encoding eq 'x-gzip')) {
+            $status = $gz->inflate($data, $out) ;
+        } else {
+            $out = $data;
+        }
+        print $fh $out;
+        $ctx->add($out);
+    });
+    close($fh);
 
     if ( $res->is_success ) {
         $status = $fingerbank::Status::OK;
-        $status_msg = "Successfully fetched '$params{'download_url'}' from Fingerbank project";
+        $status_msg = "Successfully fetched '$download_url' from Fingerbank project";
         $logger->info($status_msg);
         my $md5 = $res->header('X-Fingerbank-Md5');
-        if(defined($md5) && md5_hex($res->decoded_content) ne $md5) {
+        my $file_md5 = $ctx->hexdigest;
+        if(defined($md5) && $file_md5 ne $md5) {
             undef $ua;
-            $logger->error("Checksum does not match for download.");
+            unlink($outfile) if -f $outfile;
+            $logger->error("Checksum does not match for download expected '$md5' recieved '$file_md5'.");
             return ($fingerbank::Status::INTERNAL_SERVER_ERROR, "Checksum is not correct for download");
         }
-        open my $fh, ">", $params{'destination'} or sub { 
-            undef $ua; 
-            return ($fingerbank::Status::INTERNAL_SERVER_ERROR, "Unable to open file ".$params{"destination"}." in write mode")
-        }->();
-        print {$fh} $res->decoded_content;
-        close($fh);
+        if(!rename $outfile, $params{'destination'}) {
+            undef $ua;
+            unlink($outfile) if -f $outfile;
+            my $msg = "Cannot move $outfile to $params{destination}"; 
+            $logger->error($msg);
+            return ($fingerbank::Status::INTERNAL_SERVER_ERROR, $msg);
+        }
         set_permissions($params{'destination'}, { 'permissions' => $fingerbank::Constant::FILE_PERMISSIONS });
     } else {
+        unlink($outfile) if -f $outfile;
         $status = $fingerbank::Status::INTERNAL_SERVER_ERROR;
-        $status_msg = "Failed to download latest version of file '$params{'destination'}' on '$params{'download_url'}' with the following return code: " . $res->status_line;
+        $status_msg = "Failed to download latest version of file '$params{destination}' on '$download_url' with the following return code: " . $res->status_line;
         $logger->warn($status_msg);
     }
     undef $ua;
@@ -299,7 +330,7 @@ sub get_lwp_client {
         return $ua;
     }
     
-    $ua->default_header('Accept-Encoding' => scalar HTTP::Message::decodable());
+    $ua->default_header('Accept-Encoding' => 'gzip, x-gzip');
 
     return $ua;
 }
