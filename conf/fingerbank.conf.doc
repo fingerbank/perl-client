@@ -10,6 +10,13 @@ description=<<EOT
 URL to fetch the upstream Fingerbank project database
 EOT
 
+[upstream.db_force_checksum]
+type=toggle
+options=enabled|disabled
+description=<<EOT
+Whether or not to discard a DB download if the checksum isn't provided with it
+EOT
+
 [upstream.sqlite_db_retention]
 type=numeric
 description=<<EOT
