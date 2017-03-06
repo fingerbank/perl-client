@@ -22,7 +22,7 @@ use fingerbank::FilePath qw($INSTALL_PATH $LOCAL_DB_FILE $UPSTREAM_DB_FILE %SCHE
 use fingerbank::Log;
 use fingerbank::Schema::Local;
 use fingerbank::Schema::Upstream;
-use fingerbank::Util qw(is_success is_error is_disabled);
+use fingerbank::Util qw(is_success is_error is_disabled is_enabled);
 use fingerbank::DB;
 
 has 'schema'        => (is => 'rw');
@@ -117,7 +117,12 @@ sub update_upstream {
     my $download_url    = ( exists($params{'download_url'}) && $params{'download_url'} ne "" ) ? $params{'download_url'} : $Config->{'upstream'}{'db_url'};
     my $destination     = ( exists($params{'destination'}) && $params{'destination'} ne "" ) ? $params{'destination'} : $UPSTREAM_DB_FILE;
 
-    ($status, $status_msg) = fingerbank::Util::update_file( ('download_url' => $download_url, 'destination' => $destination, %params) );
+    ($status, $status_msg) = fingerbank::Util::update_file( (
+            'download_url' => $download_url, 
+            'destination' => $destination, 
+            'force_md5_check' => is_enabled($Config->{upstream}{db_download_force_md5_check}),
+            %params
+    ) );
 
     fingerbank::Util::cleanup_backup_files($destination, $Config->{upstream}{sqlite_db_retention});
 
