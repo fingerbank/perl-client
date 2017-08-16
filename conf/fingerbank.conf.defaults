@@ -1,6 +1,7 @@
 [upstream]
 api_key =
 db_url = https://fingerbank.inverse.ca/api/v1/download
+db_force_checksum=enabled
 sqlite_db_retention = 2
 interrogate = enabled
 interrogate_url = https://fingerbank.inverse.ca/api/v1/combinations/interrogate

@@ -279,6 +279,12 @@ sub fetch_file {
         $logger->info($status_msg);
         my $md5 = $res->header('X-Fingerbank-Md5');
         my $file_md5 = $ctx->hexdigest;
+        if($params{force_checksum} && !defined($md5)) {
+            undef $ua;
+            unlink($outfile) if -f $outfile;
+            $logger->error("Checksum is required and not provided in download. Ignoring downloaded file.");
+            return ($fingerbank::Status::INTERNAL_SERVER_ERROR, "Checksum is not provided with download");
+        }
         if(defined($md5) && $file_md5 ne $md5) {
             undef $ua;
             unlink($outfile) if -f $outfile;
