@@ -10,6 +10,13 @@ description=<<EOT
 URL to fetch the upstream Fingerbank project database
 EOT
 
+[upstream.db_download_force_md5_check]
+type=toggle
+options=enabled|disabled
+description=<<EOT
+Whether or not to force the MD5 validation when downloading the Upstream DB. Should the Fingerbank API fail to provide the checksum along with the download, it will be discarded.
+EOT
+
 [upstream.sqlite_db_retention]
 type=numeric
 description=<<EOT
