@@ -6,7 +6,7 @@
 # Source debconf library.
 set -e
 
-. /usr/share/debconf/confmodule
+#. /usr/share/debconf/confmodule
 
 # summary of how this script can be called:
 #        * <postinst> `configure' <most-recently-configured-version>
@@ -30,15 +30,15 @@ case "$1" in
         export FINGERBANK=/usr/local/fingerbank
         cd /usr/local/fingerbank
         make init-db-local
-        db_get fingerbank/haskey
-        _KEY=$RET
-        if [ ${_KEY} != "false" ] ; then
-            db_get fingerbank/apikey
-            _APIKEY=$RET
-            curl -o $FINGERBANK/db/fingerbank_Combination_Map.json https://fingerbank.inverse.ca/api/v1/download-attribute-map?key=${_APIKEY}
-            curl -o $FINGERBANK/db/fingerbank_Upstream.db https://fingerbank.inverse.ca/api/v1/download?key=${_APIKEY}
-            curl -o $FINGERBANK/conf/fingerbank-p0f.fp https://fingerbank.inverse.ca/api/v1/download-p0f-map?key=${_APIKEY}
-        fi
+        #db_get fingerbank/haskey
+        #_KEY=$RET
+        #if [ ${_KEY} != "false" ] ; then
+        #    db_get fingerbank/apikey
+        #    _APIKEY=$RET
+        #    curl -o $FINGERBANK/db/fingerbank_Combination_Map.json https://fingerbank.inverse.ca/api/v1/download-attribute-map?key=${_APIKEY}
+        #    curl -o $FINGERBANK/db/fingerbank_Upstream.db https://fingerbank.inverse.ca/api/v1/download?key=${_APIKEY}
+        #    curl -o $FINGERBANK/conf/fingerbank-p0f.fp https://fingerbank.inverse.ca/api/v1/download-p0f-map?key=${_APIKEY}
+        #fi
         make fixpermissions
         db_stop
     ;;
