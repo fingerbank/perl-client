@@ -88,9 +88,9 @@ package-debian:
 			cd .. ; \
 		fi ; \
 		read -p "API key: " api_key; \
-		curl -X GET https://fingerbank.inverse.ca/api/v1/download?key=$$api_key -H 'Accept-Encoding: gzip, deflate, sdch, br' --compressed --keepalive-time 3 --retry 5 --output $$tmp_dir/db/fingerbank_Upstream.db; \
-		curl -X GET https://fingerbank.inverse.ca/api/v1/download-p0f-map?key=$$api_key --output $$tmp_dir/conf/fingerbank-p0f.fp; \
-		curl -X GET https://fingerbank.inverse.ca/api/v1/download-attribute-map?key=$$api_key -H 'Accept-Encoding: gzip, deflate, sdch, br' --compressed --keepalive-time 3 --retry 5 --output $$tmp_dir/db/fingerbank_Combination_Map.json; \
+		curl -H "User-Agent: Fingerbank-Perl-Library/debian-build" -X GET https://fingerbank.inverse.ca/api/v1/download?key=$$api_key -H 'Accept-Encoding: gzip, deflate, sdch, br' --compressed --keepalive-time 3 --retry 5 --output $$tmp_dir/db/fingerbank_Upstream.db; \
+		curl -H "User-Agent: Fingerbank-Perl-Library/debian-build" -X GET https://fingerbank.inverse.ca/api/v1/download-p0f-map?key=$$api_key --output $$tmp_dir/conf/fingerbank-p0f.fp; \
+		curl -H "User-Agent: Fingerbank-Perl-Library/debian-build" -X GET https://fingerbank.inverse.ca/api/v1/download-attribute-map?key=$$api_key -H 'Accept-Encoding: gzip, deflate, sdch, br' --compressed --keepalive-time 3 --retry 5 --output $$tmp_dir/db/fingerbank_Combination_Map.json; \
 		cp $$tmp_dir/db/fingerbank_Upstream.db db/fingerbank_Upstream.db; \
 		cp $$tmp_dir/conf/fingerbank-p0f.fp conf/fingerbank-p0f.fp; \
 		cp $$tmp_dir/db/fingerbank_Combination_Map.json db/fingerbank_Combination_Map.json; \
