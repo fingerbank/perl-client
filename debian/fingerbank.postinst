@@ -40,7 +40,7 @@ case "$1" in
         #    curl -o $FINGERBANK/conf/fingerbank-p0f.fp https://fingerbank.inverse.ca/api/v1/download-p0f-map?key=${_APIKEY}
         #fi
         make fixpermissions
-        db_stop
+        #db_stop
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

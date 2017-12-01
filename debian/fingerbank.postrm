@@ -41,7 +41,7 @@ case "$1" in
         # Source debconf library.
         . /usr/share/debconf/confmodule
         # Remove my changes to the db.
-        db_purge
+        #db_purge
         # purging all files
         /usr/bin/find /usr/local/fingerbank  -type d|sort -r|xargs rm -r
         ;;
