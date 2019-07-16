@@ -16,7 +16,8 @@
     # to include source tar in changes file used by reprepro
     - echo "DEBUILD_DPKG_BUILDPACKAGE_OPTS='-sa'" > ~/.devscripts
     - ci-build-pkg
-    - 'DEB_RELEASE_NAME=$(lsb_release -c -s)'
+
+.copy_source_script: &src_script
     # copy source in result dir
     - cp ../$PACKAGE_NAME\_*.orig.tar.gz result/debian/buster/
 
@@ -81,6 +82,7 @@ build_debian_buster:
   image: buildpkg/debian:buster
   <<: *job_build
   <<: *deb_script
+  <<: *src_script
 
 build_centos_7:
   image: buildpkg/centos:7
