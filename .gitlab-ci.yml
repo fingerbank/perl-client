@@ -18,6 +18,7 @@
     - ci-build-pkg
 
 .copy_source_script: &src_script
+  script:
     # copy source in result dir
     - cp ../$PACKAGE_NAME\_*.orig.tar.gz result/debian/buster/
 
