@@ -16,8 +16,9 @@
     # to include source tar in changes file used by reprepro
     - echo "DEBUILD_DPKG_BUILDPACKAGE_OPTS='-sa'" > ~/.devscripts
     - ci-build-pkg
+    - 'DEB_RELEASE_NAME=$(lsb_release -c -s)'
     # copy source in result dir
-    - cp ../$PACKAGE_NAME\_*.orig.tar.gz result/debian/stretch/
+    - cp ../$PACKAGE_NAME\_*.orig.tar.gz result/debian/$DEB_RELEASE_NAME/
 
 
 .rhel_script: &rpm_script
@@ -76,6 +77,11 @@ build_debian_stretch:
   <<: *job_build
   <<: *deb_script
 
+build_debian_buster:
+  image: buildpkg/debian:buster
+  <<: *job_build
+  <<: *deb_script
+
 build_centos_7:
   image: buildpkg/centos:7
   <<: *job_build
@@ -92,6 +98,7 @@ sign:
     - ci-sign-pkg
   dependencies:
     - build_debian_stretch
+    - build_debian_buster
     - build_centos_7
   artifacts:
     expire_in: 1 day
@@ -128,6 +135,17 @@ install_debian_stretch:
     - cd vagrant/ ; vagrant up fbdeb9dev --provider=libvirt --destroy-on-error
   after_script:
     - cd vagrant/ ; vagrant destroy -f fbdeb9dev
+    - rm -rf .vagrant/ roles/
+  dependencies: []
+  tags:
+    - shell
+
+install_debian_buster:
+  stage: install
+  script:
+    - cd vagrant/ ; vagrant up fbdeb10dev --provider=libvirt --destroy-on-error
+  after_script:
+    - cd vagrant/ ; vagrant destroy -f fbdeb10dev
     - rm -rf .vagrant/ roles/
   dependencies: []
   tags:
