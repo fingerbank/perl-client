@@ -18,7 +18,7 @@
     - ci-build-pkg
     - 'DEB_RELEASE_NAME=$(lsb_release -c -s)'
     # copy source in result dir
-    - cp ../$PACKAGE_NAME\_*.orig.tar.gz result/debian/$DEB_RELEASE_NAME/
+    - cp ../$PACKAGE_NAME\_*.orig.tar.gz result/debian/buster/
 
 
 .rhel_script: &rpm_script
