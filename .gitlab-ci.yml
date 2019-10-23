@@ -41,8 +41,10 @@ variables:
   # stored in a temp place
   UPSTREAM_VERSION_FILE: t/upstream_version.txt
   PACKAGE_NAME: fingerbank
+  # env variables
   DEB_PACKAGES_NAME: "['fingerbank']"
   RPM_PACKAGES_NAME: "['fingerbank']"
+  ANSIBLE_FORCE_COLOR: "true"
 
 ### JOBS
 # for debug purpose
